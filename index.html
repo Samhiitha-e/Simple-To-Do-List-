@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            margin: 0;
+            padding: 0;
+            transition: background 0.4s ease;
+        }
+        
+        header h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        #toggleMode {
+            background: #222;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        #toggleMode:hover {
+            background: #444;
+        }
+        
+        #todo-container {
+            width: 400px;
+            margin: auto;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            background: #f0f0f0;
+        }
+        
+        button {
+            background: #2575fc;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        button:hover {
+            background: #1a5fd0;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #d1e7ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .delete-btn:hover {
+            background: #e63946;
+        }
+        
+        .dark-mode {
+            background: linear-gradient(135deg, #1b1b2f, #162447);
+            color: #ffffff;
+        }
+        
+        .dark-mode #todo-container {
+            background: #2a2a3c;
+        }
+        
+        .dark-mode input {
+            background: #3a3a4f;
+            color: white;
+        }
+        
+        .dark-mode li {
+            background: #3a3a4f;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>To-Do List</h1>
+        <button id="toggleMode">Toggle Dark Mode</button>
+    </header>
+    
+    <div id="todo-container">
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Enter a task...">
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTasks();
+            document.getElementById("toggleMode").onclick = toggleMode;
+        });
+
+        function addTask() {
+            let taskInput = document.getElementById("taskInput");
+            let taskList = document.getElementById("taskList");
+
+            if (taskInput.value.trim() === "") {
+                alert("Enter a valid task!");
+                return;
+            }
+
+            let li = document.createElement("li");
+            li.innerHTML = `${taskInput.value} <span class="delete-btn" onclick="deleteTask(this)">❌</span>`;
+            taskList.appendChild(li);
+            saveTasks();
+            taskInput.value = "";
+        }
+
+        function deleteTask(element) {
+            element.parentElement.remove();
+            saveTasks();
+        }
+
+        function saveTasks() {
+            let tasks = [];
+            document.querySelectorAll("#taskList li").forEach((li) => {
+                tasks.push(li.innerText.replace("❌", "").trim());
+            });
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            let savedTasks = JSON.parse(localStorage.getItem("tasks"));
+            if (savedTasks) {
+                savedTasks.forEach((task) => {
+                    let li = document.createElement("li");
+                    li.innerHTML = `${task} <span class="delete-btn" onclick="deleteTask(this)">❌</span>`;
+                    document.getElementById("taskList").appendChild(li);
+                });
+            }
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+            let mode = document.body.classList.contains("dark-mode") ? "dark" : "light";
+            localStorage.setItem("mode", mode);
+        }
+
+        if (localStorage.getItem("mode") === "dark") {
+            document.body.classList.add("dark-mode");
+        }
+    </script>
+</body>
+</html>
